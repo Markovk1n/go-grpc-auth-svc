@@ -18,7 +18,7 @@ func main() {
 		log.Fatalln("Failed at config", err)
 	}
 
-	h := db.Init(c.DBUrl)
+	dataBase := db.Init(c.DBUrl)
 	jwt := utils.JwtWrapper{
 		SecretKey:       c.JWTSecretKey,
 		Issuer:          "go-grpc-auth-svc",
@@ -34,7 +34,7 @@ func main() {
 	fmt.Println("Auth Svc on", c.Port)
 
 	s := services.Server{
-		H:   h,
+		H:   dataBase,
 		Jwt: jwt,
 	}
 

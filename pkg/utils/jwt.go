@@ -2,9 +2,10 @@ package utils
 
 import (
 	"errors"
+	"time"
+
 	"github.com/Markovk1n/go-grpc-auth-svc/pkg/models"
 	"github.com/golang-jwt/jwt"
-	"time"
 )
 
 type JwtWrapper struct {
@@ -15,13 +16,13 @@ type JwtWrapper struct {
 
 type jwtClaims struct {
 	jwt.StandardClaims
-	id    int64
+	Id    int64
 	Email string
 }
 
 func (w *JwtWrapper) GenerateToken(user models.User) (signedToken string, err error) {
 	claims := &jwtClaims{
-		id:    user.Id,
+		Id:    user.Id,
 		Email: user.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(w.ExpirationHours)).Unix(),
@@ -29,7 +30,7 @@ func (w *JwtWrapper) GenerateToken(user models.User) (signedToken string, err er
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	signedToken, err = token.SignedString([]byte(w.SecretKey))
 
@@ -38,7 +39,6 @@ func (w *JwtWrapper) GenerateToken(user models.User) (signedToken string, err er
 	}
 
 	return signedToken, nil
-
 }
 
 func (w *JwtWrapper) ValidateToken(signedToken string) (claims *jwtClaims, err error) {
